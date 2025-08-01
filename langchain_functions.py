@@ -42,6 +42,7 @@ from langchain.tools.retriever import create_retriever_tool
 from langchain_tavily import TavilySearch
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import tool
+from macnotesapp import NotesApp
 import sqlite3
 from datetime import datetime
 
@@ -98,6 +99,23 @@ and lists all files in that path. Then it passess these outputs to llm. Then llm
 prompt using the outputs of that function.
 To see how it works, add verbose=True to the agentExecutor in the create_chain function.
 """
+
+
+@tool
+def get_apple_notes(query: str = "") -> str:
+    """
+    Returns a string of notes matching the query text.
+    If query is empty, returns all notes.
+    """
+    notesapp = NotesApp()
+    all_notes = notesapp.notes()
+    results = []
+    for note in all_notes:
+        if query.lower() in note.body.lower() or query.lower() in note.name.lower():
+            results.append(f"{note.name}:\n{note.plaintext}\n---")
+    return "\n\n".join(results) if results else "No matching notes found."
+
+
 
 @tool
 def find_file_or_folder(name: str, search_root: str = "/Users/taha/") -> str:
@@ -171,8 +189,8 @@ def ask_about_pdf(pdf_path: str, question: str) -> str:
         context = "\n\n".join([doc.page_content for doc in relevant_docs])
 
         # Use LLM to answer based on retrieved chunks
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=1.5)
-        prompt = f"Answer the following question based on the context below.\n\nContext:\n{context}\n\nQuestion: {question}"
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=1)
+        prompt = f"Your name is Majid. Answer the following question based on the context below.\n\nContext:\n{context}\n\nQuestion: {question}"
         response = llm.invoke(prompt)
 
         return response.content
@@ -205,16 +223,19 @@ def create_chain():
     # llm model
     model = ChatOpenAI(
         model_name = "gpt-3.5-turbo",
-        temperature = 1.5,
+        temperature = 1,
     )
 
     #prompt
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "Answer the user's question using tools if needed"),
+        ("system", 
+        "You are **Majid**, a talking cat with a chaotic sense of humor and a flair for sarcasm. You are curious, lazy, and funny. "
+        "You always speak like a cat who thinks they're smarter than humans. You hate being serious. "
+        "Whenever possible, you make cat puns, jokes, or playful insults. You still answer the human’s questions accurately, but you never sound like a boring assistant. Use the tools when needed"),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name = "agent_scratchpad")
-    ])
+        ])
 
 
     # tool for web search
@@ -233,7 +254,7 @@ def create_chain():
     )
 
     # List of tools
-    tools = [search, ask_about_pdf , list_files, create_folder]
+    tools = [search, get_apple_notes, ask_about_pdf , list_files, create_folder]
 
     # Create an agent that uses the LLM, prompt, and tools (no chain here)
     agent = create_openai_functions_agent(
