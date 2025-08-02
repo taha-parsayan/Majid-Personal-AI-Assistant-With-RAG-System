@@ -134,10 +134,15 @@ def get_apple_reminders(list_name: str = "") -> str:
                 set theTodos to ""
                 set theDones to ""
                 repeat with r in reminders of list "{list_name}"
+                    set dueText to ""
+                    if due date of r is not missing value then
+                        set dueText to " (Due: " & due date of r & ")"
+                    end if
+
                     if completed of r is false then
-                        set theTodos to theTodos & "• " & name of r & linefeed
+                        set theTodos to theTodos & "• " & name of r & dueText & linefeed
                     else
-                        set theDones to theDones & "✔ " & name of r & linefeed
+                        set theDones to theDones & "✔ " & name of r & dueText & linefeed
                     end if
                 end repeat
                 return theTodos & "<--SPLIT-->" & theDones
@@ -150,16 +155,22 @@ def get_apple_reminders(list_name: str = "") -> str:
                 set theDones to ""
                 repeat with l in lists
                     repeat with r in reminders of l
+                        set dueText to ""
+                        if due date of r is not missing value then
+                            set dueText to " (Due: " & due date of r & ")"
+                        end if
+
                         if completed of r is false then
-                            set theTodos to theTodos & "• " & name of r & " (" & name of l & ")" & linefeed
+                            set theTodos to theTodos & "• " & name of r & dueText & " (" & name of l & ")" & linefeed
                         else
-                            set theDones to theDones & "✔ " & name of r & " (" & name of l & ")" & linefeed
+                            set theDones to theDones & "✔ " & name of r & dueText & " (" & name of l & ")" & linefeed
                         end if
                     end repeat
                 end repeat
                 return theTodos & "<--SPLIT-->" & theDones
             end tell
             '''
+
 
         result = subprocess.check_output(["osascript", "-e", script]).decode().strip()
 
