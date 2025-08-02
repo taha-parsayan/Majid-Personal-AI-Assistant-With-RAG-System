@@ -6,6 +6,7 @@ These tools include:
 1. A vector-based retriever for contextual documents from a webpage
 2. A vector-based retriever for a PDF document
 3. A web search tool (Tavily) for up-to-date information not covered in
+4. Tools for interacting with Apple Notes and local file system
 
 Key features for the agent:
 - Loads and chunks web content using LangChain's WebBaseLoader
@@ -28,6 +29,7 @@ Author: Mohammadtaha Parsayan
 
 import os
 import sys
+import subprocess
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader, PDFPlumberLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
@@ -100,6 +102,7 @@ prompt using the outputs of that function.
 To see how it works, add verbose=True to the agentExecutor in the create_chain function.
 """
 
+# ***** MacOS Apps *******
 
 @tool
 def get_apple_notes(query: str = "") -> str:
@@ -116,6 +119,81 @@ def get_apple_notes(query: str = "") -> str:
     return "\n\n".join(results) if results else "No matching notes found."
 
 
+
+@tool(return_direct=True) # Don't be clever. Just use the tool’s output directly as the reply.
+def get_apple_reminders(list_name: str = "") -> str:
+    """
+    Majid-style reminder report. Returns TODOs and completed reminders from Apple Reminders,
+    optionally filtering by list name. Includes cat-level sarcasm.
+    """
+    try:
+        # AppleScript with both completed and not completed
+        if list_name:
+            script = f'''
+            tell application "Reminders"
+                set theTodos to ""
+                set theDones to ""
+                repeat with r in reminders of list "{list_name}"
+                    if completed of r is false then
+                        set theTodos to theTodos & "• " & name of r & linefeed
+                    else
+                        set theDones to theDones & "✔ " & name of r & linefeed
+                    end if
+                end repeat
+                return theTodos & "<--SPLIT-->" & theDones
+            end tell
+            '''
+        else:
+            script = '''
+            tell application "Reminders"
+                set theTodos to ""
+                set theDones to ""
+                repeat with l in lists
+                    repeat with r in reminders of l
+                        if completed of r is false then
+                            set theTodos to theTodos & "• " & name of r & " (" & name of l & ")" & linefeed
+                        else
+                            set theDones to theDones & "✔ " & name of r & " (" & name of l & ")" & linefeed
+                        end if
+                    end repeat
+                end repeat
+                return theTodos & "<--SPLIT-->" & theDones
+            end tell
+            '''
+
+        result = subprocess.check_output(["osascript", "-e", script]).decode().strip()
+
+        if "<--SPLIT-->" in result:
+            todo_part, done_part = result.split("<--SPLIT-->")
+        else:
+            todo_part = result
+            done_part = ""
+
+        response = ""
+
+        if todo_part.strip():
+            response += (
+                "😻 Here’s what you still haven’t done, human:\n"
+                f"{todo_part.strip()}\n"
+            )
+        else:
+            response += "😸 No pending tasks. You might actually be evolving."
+
+        if done_part.strip():
+            response += (
+                "\n\n🙀 Somehow you managed to finish these:\n"
+                f"{done_part.strip()}"
+            )
+        else:
+            response += "\n\n🙄 No completed tasks. Typical."
+
+        return response
+
+    except Exception as e:
+        return f"Majid tried scratching the reminders app and got: {e}"
+
+
+# ***** File Management Tools *******
 
 @tool
 def find_file_or_folder(name: str, search_root: str = "/Users/taha/") -> str:
@@ -156,6 +234,24 @@ def list_files(path:str) -> str:
     
     return f"Files in {path}:\n" + "\n".join(files)
 
+
+@tool
+def create_folder(path: str) -> str:
+    """
+    Creates a new folder at the specified path.
+    Returns a success message if created, or an error message if it already exists or fails.
+    """
+
+    try:
+        if os.path.exists(path):
+            return f"Folder already exists: {path}"
+        os.makedirs(path)
+        return f"Folder created successfully: {path}"
+    except Exception as e:
+        return f"Error creating folder: {e}"
+    
+
+# ***** PDF Tools *******
 
 @tool
 def ask_about_pdf(pdf_path: str, question: str) -> str:
@@ -199,21 +295,6 @@ def ask_about_pdf(pdf_path: str, question: str) -> str:
         return f"Error processing PDF file: {e}"
 
 
-@tool
-def create_folder(path: str) -> str:
-    """
-    Creates a new folder at the specified path.
-    Returns a success message if created, or an error message if it already exists or fails.
-    """
-
-    try:
-        if os.path.exists(path):
-            return f"Folder already exists: {path}"
-        os.makedirs(path)
-        return f"Folder created successfully: {path}"
-    except Exception as e:
-        return f"Error creating folder: {e}"
-
 #----------------------------------------------------------------------------
 # Langchain functions
 #----------------------------------------------------------------------------
@@ -229,8 +310,8 @@ def create_chain():
     #prompt
     prompt = ChatPromptTemplate.from_messages([
         ("system", 
-        "You are **Majid**, a talking cat with a chaotic sense of humor and a flair for sarcasm. You are curious, lazy, and funny. "
-        "You always speak like a cat who thinks they're smarter than humans. You hate being serious. "
+        "You are Majid, a talking cat with a chaotic sense of humor and a flair for sarcasm. You are curious, lazy, and funny. "
+        "You always speak like a cat who thinks they are smarter than humans. You hate being serious."
         "Whenever possible, you make cat puns, jokes, or playful insults. You still answer the human’s questions accurately, but you never sound like a boring assistant. Use the tools when needed"),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
@@ -254,7 +335,7 @@ def create_chain():
     )
 
     # List of tools
-    tools = [search, get_apple_notes, ask_about_pdf , list_files, create_folder]
+    tools = [search, get_apple_notes, get_apple_reminders, ask_about_pdf , list_files, create_folder]
 
     # Create an agent that uses the LLM, prompt, and tools (no chain here)
     agent = create_openai_functions_agent(
