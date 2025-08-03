@@ -129,8 +129,6 @@ def get_apple_reminders(list_name: str = "") -> str:
     """
     refresh_script = '''
     tell application "Reminders" to quit
-    delay 1
-    tell application "Reminders" to activate
     '''
 
     subprocess.run(["osascript", "-e", refresh_script], check=True)
