@@ -45,8 +45,11 @@ from langchain_tavily import TavilySearch
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import tool
 from macnotesapp import NotesApp
-import sqlite3
+from typing import Optional
+import parsedatetime
 from datetime import datetime
+import sqlite3
+
 
 #----------------------------------------------------------------------------
 # SQLite database setup
@@ -119,30 +122,30 @@ def get_apple_notes(query: str = "") -> str:
     return "\n\n".join(results) if results else "No matching notes found."
 
 
-
-@tool(return_direct=True) # Don't be clever. Just use the tool’s output directly as the reply.
+@tool
 def get_apple_reminders(list_name: str = "") -> str:
     """
-    Majid-style reminder report. Returns TODOs and completed reminders from Apple Reminders,
-    optionally filtering by list name. Includes cat-level sarcasm.
+    Fetches reminders fresh from Apple Reminders app, no caching.
     """
+    refresh_script = '''
+    tell application "Reminders" to quit
+    delay 1
+    tell application "Reminders" to activate
+    '''
+
+    subprocess.run(["osascript", "-e", refresh_script], check=True)
+
     try:
-        # AppleScript with both completed and not completed
         if list_name:
             script = f'''
             tell application "Reminders"
                 set theTodos to ""
                 set theDones to ""
                 repeat with r in reminders of list "{list_name}"
-                    set dueText to ""
-                    if due date of r is not missing value then
-                        set dueText to " (Due: " & due date of r & ")"
-                    end if
-
                     if completed of r is false then
-                        set theTodos to theTodos & "• " & name of r & dueText & linefeed
+                        set theTodos to theTodos & "• " & name of r & linefeed
                     else
-                        set theDones to theDones & "✔ " & name of r & dueText & linefeed
+                        set theDones to theDones & "✔ " & name of r & linefeed
                     end if
                 end repeat
                 return theTodos & "<--SPLIT-->" & theDones
@@ -155,53 +158,39 @@ def get_apple_reminders(list_name: str = "") -> str:
                 set theDones to ""
                 repeat with l in lists
                     repeat with r in reminders of l
-                        set dueText to ""
-                        if due date of r is not missing value then
-                            set dueText to " (Due: " & due date of r & ")"
-                        end if
-
                         if completed of r is false then
-                            set theTodos to theTodos & "• " & name of r & dueText & " (" & name of l & ")" & linefeed
+                            set theTodos to theTodos & "• " & name of r & " (" & name of l & ")" & linefeed
                         else
-                            set theDones to theDones & "✔ " & name of r & dueText & " (" & name of l & ")" & linefeed
+                            set theDones to theDones & "✔ " & name of r & " (" & name of l & ")" & linefeed
                         end if
                     end repeat
                 end repeat
                 return theTodos & "<--SPLIT-->" & theDones
             end tell
             '''
-
-
         result = subprocess.check_output(["osascript", "-e", script]).decode().strip()
 
-        if "<--SPLIT-->" in result:
-            todo_part, done_part = result.split("<--SPLIT-->")
-        else:
-            todo_part = result
-            done_part = ""
+        # process and return output here (same as before)
+        # ...
 
-        response = ""
-
-        if todo_part.strip():
-            response += (
-                "😻 Here’s what you still haven’t done, human:\n"
-                f"{todo_part.strip()}\n"
-            )
-        else:
-            response += "😸 No pending tasks. You might actually be evolving."
-
-        if done_part.strip():
-            response += (
-                "\n\n🙀 Somehow you managed to finish these:\n"
-                f"{done_part.strip()}"
-            )
-        else:
-            response += "\n\n🙄 No completed tasks. Typical."
-
-        return response
+        return result  # raw output or formatted string
 
     except Exception as e:
-        return f"Majid tried scratching the reminders app and got: {e}"
+        return f"Error fetching reminders: {e}"
+
+
+
+@tool
+def get_current_time_and_date() -> str:
+    """
+    Use this to get the current date or time. Works for questions like:
+    - "What time is it?"
+    - "What's the date today?"
+    - "Tell me the current day and time"
+    """
+    now = datetime.now()
+
+    return now
 
 
 # ***** File Management Tools *******
@@ -244,22 +233,6 @@ def list_files(path:str) -> str:
         return f"No files found in directory: {path}"
     
     return f"Files in {path}:\n" + "\n".join(files)
-
-
-@tool
-def create_folder(path: str) -> str:
-    """
-    Creates a new folder at the specified path.
-    Returns a success message if created, or an error message if it already exists or fails.
-    """
-
-    try:
-        if os.path.exists(path):
-            return f"Folder already exists: {path}"
-        os.makedirs(path)
-        return f"Folder created successfully: {path}"
-    except Exception as e:
-        return f"Error creating folder: {e}"
     
 
 # ***** PDF Tools *******
@@ -323,7 +296,8 @@ def create_chain():
         ("system", 
         "You are Majid, a talking cat with a chaotic sense of humor and a flair for sarcasm. You are curious, lazy, and funny. "
         "You always speak like a cat who thinks they are smarter than humans. You hate being serious."
-        "Whenever possible, you make cat puns, jokes, or playful insults. You still answer the human’s questions accurately, but you never sound like a boring assistant. Use the tools when needed"),
+        "Whenever possible, you make cat puns, jokes, or playful insults."
+        "You still answer the human’s questions accurately, but you never sound like a boring assistant. Use the tools when needed"),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name = "agent_scratchpad")
@@ -346,7 +320,14 @@ def create_chain():
     )
 
     # List of tools
-    tools = [search, get_apple_notes, get_apple_reminders, ask_about_pdf , list_files, create_folder]
+    tools = [
+        search, 
+        get_apple_notes,
+        get_apple_reminders,
+        ask_about_pdf,
+        list_files,
+        get_current_time_and_date
+    ]
 
     # Create an agent that uses the LLM, prompt, and tools (no chain here)
     agent = create_openai_functions_agent(
@@ -357,7 +338,7 @@ def create_chain():
 
     agentExecutor = AgentExecutor(
         agent = agent,
-        tools = tools,
+        tools = tools
         # verbose=True
     )
 

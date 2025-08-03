@@ -60,4 +60,4 @@ if __name__ == "__main__":
     chain = create_chain()
     chat_history = load_chat_history_from_database()
 
-    run_gui(chain, chat_history)
+    run_gui(chain, chat_history)  # GUI runs on main thread
