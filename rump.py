@@ -16,9 +16,8 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 import datetime
 from langchain_functions import get_apple_reminders, get_apple_notes
-import tempfile
-import customtkinter as ctk
-
+from functools import partial
+from mac_notifications import client
 #--------------------------------------------------
 # Define the MajidRump class
 #--------------------------------------------------
@@ -27,7 +26,6 @@ class MajidRump(rumps.App):
     def __init__(self):
         super().__init__("😼 Majid", icon="Menu_icon.png")
         self.menu = ["Majid summary", "Chat to Majid"]
-
 
 #********** Chat to majid **********
 
@@ -40,11 +38,15 @@ class MajidRump(rumps.App):
 
     @rumps.clicked("Majid summary")
     def show_summary(self, _):
+
+        client.create_notification(
+            title="🐾",
+            subtitle="Majid is making your summary",
+            icon="/Users/taha/Documents/Python_codes/Majid/App_icon.icns",
+            sound="Frog",
+        )
         summary = self.generate_summary()
         rumps.alert(title="😼 Majid Summary", message=summary)
-
-    
-
 
     def generate_summary(self):
         # get current date
@@ -55,22 +57,31 @@ class MajidRump(rumps.App):
         notes_text = get_apple_notes("")
 
         prompt = (
-            "You are Majid, a talking cat with a chaotic sense of humor and a flair for sarcasm. You are curious, lazy, and funny. "
-            "You always speak like a cat who thinks they are smarter than humans. You hate being serious."
-            "Whenever possible, you make cat puns, jokes, or playful insults."
-            "You are talking to a human who is asking you to summarize their day."
-            f"Today is {day_date}.\n"
-            f"Here are my pending reminders:\n{reminders_text}\n\n"
-            f"Here are my notes:\n{notes_text}\n\n"
-            "First say a very funny and sarcastic greeting, then"
-            "based on my notes and reminders, create a friendly and organized daily plan for me, listing "
-            "what I should do today and how to prioritize tasks. Make sure your response has clarity and easy to read."
-            "First give a list of my reminders for today, then a short list of my tasks based on my notes."
-            "Since my notes might be a lot, try to keep it short (upt to 10 items) but helpful and comprehensive."
-            "At the end, give me a short summary of what I need to do."
-            "Do not use ** in your answer."
-            "Keep being hilarious and funny and catty."
+            "You are Majid, a sarcastic, talking cat with a chaotic sense of humor. You think you're smarter than humans, "
+            "you're lazy, witty, and love making cat puns and jokes. Never be serious, and always stay hilarious and catty.\n\n"
+
+            f"Today is {day_date}.\n\n"
+
+            "Here are my **pending and incomplete reminders**:\n"
+            f"{reminders_text}\n\n"
+
+            "Here are my **personal notes**:\n"
+            f"{notes_text}\n\n"
+
+            "Instructions:\n"
+            "1. Start with a sarcastic and hilarious greeting as Majid.\n"
+            "2. Only use reminders that are incomplete or still pending today.\n"
+            "3. Only use notes that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
+            "4. Make a clear and organized daily plan, starting with a bullet list of reminders, then a short list of actionable tasks based on notes (up to 10 max).\n"
+            "5. End with a short and funny summary of what I need to do.\n\n"
+
+            "Style Guide:\n"
+            "- Avoid using ** or markdown formatting.\n"
+            "- Prioritize clarity, humor, and sarcasm.\n"
+            "- Be concise but helpful. Don't ramble.\n"
+            "- Stay in character as a cat who’s both genius and lazy.\n"
         )
+
 
         model = ChatOpenAI(
             model_name="gpt-3.5-turbo",

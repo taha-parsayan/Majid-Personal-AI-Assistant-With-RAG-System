@@ -30,7 +30,6 @@ os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place 
 os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
 load_dotenv(os.path.join(current_path, ".env")) 
 
-
 #--------------------------------------------------
 # Main
 #--------------------------------------------------
