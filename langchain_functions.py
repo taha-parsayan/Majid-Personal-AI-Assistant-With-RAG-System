@@ -48,7 +48,7 @@ from macnotesapp import NotesApp
 import applescript
 from typing import Optional
 import parsedatetime
-from datetime import datetime
+import datetime
 import sqlite3
 
 
@@ -90,7 +90,7 @@ def load_chat_history_from_database():
 def save_message_in_database(role, message):
     conn = sqlite3.connect('chat_history.db')
     cursor = conn.cursor()
-    timestamp = datetime.now().isoformat()
+    timestamp = datetime.datetime.now().isoformat()
     cursor.execute("INSERT INTO history (role, message, timestamp) VALUES (?, ?, ?)",
                    (role, message, timestamp))
     conn.commit()
@@ -178,34 +178,35 @@ def get_apple_reminders(list_name: str = "") -> str:
         return f"Error fetching reminders: {e}"
 
 
-@tool(return_direct=True)
-def read_calendar_events() -> str:
+@tool
+def read_calendar_events(query: str = "") -> str:
     """Reads today's calendar events from the macOS Calendar app."""
 
-
-
     script = '''
-    set theOutput to ""
+    set output to ""
     set todayStart to current date
+    set hours of todayStart to 0
+    set minutes of todayStart to 0
+    set seconds of todayStart to 0
     set todayEnd to todayStart + (1 * days)
 
     tell application "Calendar"
-        set theCalendars to calendars
-        repeat with cal in theCalendars
-            set theEvents to every event of cal whose start date ≥ todayStart and start date < todayEnd
-            repeat with e in theEvents
-                set theOutput to theOutput & summary of e & " at " & start date of e & linefeed
-            end repeat
+        set cal to calendar "Home"
+        set theEvents to every event of cal whose start date ≥ todayStart and start date < todayEnd
+        repeat with e in theEvents
+            set eventSummary to summary of e
+            set eventStart to start date of e
+            set eventCalendar to name of cal
+            set output to output & "[" & eventCalendar & "] " & eventSummary & " at " & eventStart & linefeed
         end repeat
     end tell
-    return theOutput
+
+    return output
     '''
 
     try:
-        result = applescript.AppleScript(script).run()
-        if isinstance(result, list):
-            result = result[0]  # sometimes returned as list
-        return result if result else "No events found for today."
+        result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
+        return result
     
     except Exception as e:
         return f"Error fetching reminders: {e}"
@@ -219,7 +220,7 @@ def get_current_time_and_date() -> str:
     - "What's the date today?"
     - "Tell me the current day and time"
     """
-    now = datetime.now()
+    now = datetime.datetime.now()
 
     return now
 

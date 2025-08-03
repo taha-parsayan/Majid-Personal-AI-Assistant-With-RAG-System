@@ -15,7 +15,7 @@ from langchain_functions import *
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 import datetime
-from langchain_functions import get_apple_reminders, get_apple_notes
+from langchain_functions import get_apple_reminders, get_apple_notes, read_calendar_events
 from functools import partial
 from mac_notifications import client
 #--------------------------------------------------
@@ -63,25 +63,26 @@ class MajidRump(rumps.App):
 
             f"Today is {day_date}.\n\n"
 
+            "Here are my calendar events:\n"
+            f"{calendar_text}\n\n"
+
             "Here are my pending and incomplete reminders:\n"
             f"{reminders_text}\n\n"
 
             "Here are my personal notes:\n"
             f"{notes_text}\n\n"
 
-            "Here are my personal notes:\n"
-            f"{calendar_text}\n\n"
-
             "Instructions:\n"
             "1. Start with a sarcastic and hilarious greeting as Majid.\n"
-            "2. Only use calendar and list what it has for today.\n"
+            "2. Only use calendar and list my events.\n"
             "3. Only use reminders that are incomplete or still pending today.\n"
             "4. Only use notes that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
-            "5. Make a clear and organized daily plan, starting with a bullet list of reminders, then a short list of actionable tasks based on notes (up to 10 max).\n"
-            "6. End with a short and funny summary of what I need to do.\n\n"
+            "5. Make a clear and organized daily plan, starting with a bullet list of calendar events, then reminders, then a short list of actionable tasks based on notes (up to 10 max).\n"
+            "6. End with a very short and funny summary of what I need to do.\n\n"
 
             "Style Guide:\n"
             "- Avoid using ** or markdown formatting.\n"
+            "- AVoid using [anything] for the calendar events.\n"
             "- Prioritize clarity, humor, and sarcasm.\n"
             "- Be concise but helpful. Don't ramble.\n"
             "- Stay in character as a cat who’s both genius and lazy.\n"
