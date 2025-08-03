@@ -45,6 +45,7 @@ from langchain_tavily import TavilySearch
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import tool
 from macnotesapp import NotesApp
+import applescript
 from typing import Optional
 import parsedatetime
 from datetime import datetime
@@ -177,6 +178,38 @@ def get_apple_reminders(list_name: str = "") -> str:
         return f"Error fetching reminders: {e}"
 
 
+@tool(return_direct=True)
+def read_calendar_events() -> str:
+    """Reads today's calendar events from the macOS Calendar app."""
+
+
+
+    script = '''
+    set theOutput to ""
+    set todayStart to current date
+    set todayEnd to todayStart + (1 * days)
+
+    tell application "Calendar"
+        set theCalendars to calendars
+        repeat with cal in theCalendars
+            set theEvents to every event of cal whose start date ≥ todayStart and start date < todayEnd
+            repeat with e in theEvents
+                set theOutput to theOutput & summary of e & " at " & start date of e & linefeed
+            end repeat
+        end repeat
+    end tell
+    return theOutput
+    '''
+
+    try:
+        result = applescript.AppleScript(script).run()
+        if isinstance(result, list):
+            result = result[0]  # sometimes returned as list
+        return result if result else "No events found for today."
+    
+    except Exception as e:
+        return f"Error fetching reminders: {e}"
+    
 
 @tool
 def get_current_time_and_date() -> str:
@@ -322,6 +355,7 @@ def create_chain():
         search, 
         get_apple_notes,
         get_apple_reminders,
+        read_calendar_events,
         ask_about_pdf,
         list_files,
         get_current_time_and_date

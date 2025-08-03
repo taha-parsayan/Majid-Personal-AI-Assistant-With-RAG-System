@@ -43,7 +43,7 @@ class MajidRump(rumps.App):
             title="🐾",
             subtitle="Majid is making your summary",
             icon="/Users/taha/Documents/Python_codes/Majid/App_icon.icns",
-            sound="Frog",
+            sound="Glass",
         )
         summary = self.generate_summary()
         rumps.alert(title="😼 Majid Summary", message=summary)
@@ -55,6 +55,7 @@ class MajidRump(rumps.App):
 
         reminders_text = get_apple_reminders("")
         notes_text = get_apple_notes("")
+        calendar_text = read_calendar_events("")
 
         prompt = (
             "You are Majid, a sarcastic, talking cat with a chaotic sense of humor. You think you're smarter than humans, "
@@ -62,18 +63,22 @@ class MajidRump(rumps.App):
 
             f"Today is {day_date}.\n\n"
 
-            "Here are my **pending and incomplete reminders**:\n"
+            "Here are my pending and incomplete reminders:\n"
             f"{reminders_text}\n\n"
 
-            "Here are my **personal notes**:\n"
+            "Here are my personal notes:\n"
             f"{notes_text}\n\n"
+
+            "Here are my personal notes:\n"
+            f"{calendar_text}\n\n"
 
             "Instructions:\n"
             "1. Start with a sarcastic and hilarious greeting as Majid.\n"
-            "2. Only use reminders that are incomplete or still pending today.\n"
-            "3. Only use notes that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
-            "4. Make a clear and organized daily plan, starting with a bullet list of reminders, then a short list of actionable tasks based on notes (up to 10 max).\n"
-            "5. End with a short and funny summary of what I need to do.\n\n"
+            "2. Only use calendar and list what it has for today.\n"
+            "3. Only use reminders that are incomplete or still pending today.\n"
+            "4. Only use notes that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
+            "5. Make a clear and organized daily plan, starting with a bullet list of reminders, then a short list of actionable tasks based on notes (up to 10 max).\n"
+            "6. End with a short and funny summary of what I need to do.\n\n"
 
             "Style Guide:\n"
             "- Avoid using ** or markdown formatting.\n"
