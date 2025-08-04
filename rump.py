@@ -42,8 +42,7 @@ class MajidRump(rumps.App):
         client.create_notification(
             title="🐾",
             subtitle="Majid is making your summary",
-            icon="/Users/taha/Documents/Python_codes/Majid/App_icon.icns",
-            sound="Glass",
+            icon="/Users/taha/Documents/Python_codes/Majid/App_icon.icns"
         )
         summary = self.generate_summary()
         rumps.alert(title="😼 Majid Summary", message=summary)
@@ -74,15 +73,17 @@ class MajidRump(rumps.App):
 
             "Instructions:\n"
             "1. Start with a sarcastic and hilarious greeting as Majid.\n"
-            "2. Only use calendar and list my events.\n"
-            "3. Only use reminders that are incomplete or still pending today.\n"
-            "4. Only use notes that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
-            "5. Make a clear and organized daily plan, starting with a bullet list of calendar events, then reminders, then a short list of actionable tasks based on notes (up to 10 max).\n"
+            "2. Only use Calendar and list my events.\n"
+            "3. Only use Reminders that are incomplete or still pending today.\n"
+            "4. Only use Notes and use texts that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
+            "5. Make a clear and organized daily plan, starting with a bullet list of Calendar events, then Reminders, then a short list of tasks based on my Notes (up to 10 max).\n"
             "6. End with a very short and funny summary of what I need to do.\n\n"
 
             "Style Guide:\n"
             "- Avoid using ** or markdown formatting.\n"
             "- AVoid using [anything] for the calendar events.\n"
+            "- Avoid mixing contexts of Calendar, Reminders, and Notes.\n"
+            "- Use emojis to make it fun and engaging.\n"
             "- Prioritize clarity, humor, and sarcasm.\n"
             "- Be concise but helpful. Don't ramble.\n"
             "- Stay in character as a cat who’s both genius and lazy.\n"
