@@ -71,7 +71,7 @@ frame1 = ctk.CTkFrame(
     height=790,
     corner_radius=10,
     border_width=2,
-    border_color="#0755F2",
+    border_color="#C6C6C6",
     fg_color="#000000"
 )
 frame1.place(x=5, y=5)
@@ -92,7 +92,7 @@ entry_box.bind("<Return>", on_enter_key) # Bind Enter key to send message
 entry_box.bind("<Shift-Return>", lambda event: None)  # Let Shift+Enter create new line
 
 
-button_say = ctk.CTkButton(master=frame1, text="Meow", command=on_talk_button_click, width=370, fg_color="#0755F2")
+button_say = ctk.CTkButton(master=frame1, text="Meow", command=on_talk_button_click, width=370, fg_color="#F9F9F9", text_color="#000000", font=("Helvetica", 16, "bold"))
 button_say.place(x=10, y=750)
 
 app.mainloop()
