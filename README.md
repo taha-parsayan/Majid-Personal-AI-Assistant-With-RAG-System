@@ -38,4 +38,10 @@ Majid combines productivity with personality:
 
 ```bash
 https://github.com/taha-parsayan/Majid-Personal-AI-Assistant-With-RAG-System
+```
 
+2. Install the reuquirements:
+
+```bash
+pip install -r requirements.txt
+```
