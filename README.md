@@ -6,6 +6,7 @@
 ## Overview
 Majid is a cat! But not just any cat—he’s your AI-powered assistant built with LangChain, designed to interact with your macOS environment to make life easier (and funnier). Majid is your clever AI cat—curious, playful, and a little mischievous. He helps with research, organization, and planning, all while keeping his cat-like humor and charm.
 
+## What does Majid do?
 As a macOS user, you probably have countless notes in the Notes app, forgotten reminders piling up in the Reminders app, and a calendar full of events and meetings. Often these inputs aren’t aligned, get overlooked, or simply become overwhelming—making it hard to keep track of tasks and daily life.
 
 That’s where Majid the cat steps in. By scanning and combining these sources, Majid helps you stay on top of things by providing:
