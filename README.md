@@ -16,7 +16,7 @@ That’s where Majid the cat steps in. By scanning and combining these sources, 
 
 📄 Unlimited PDF analysis, letting you upload documents and ask questions directly based on their content.
 
-
+## What else to know?
 Majid combines productivity with personality:
 
 🐾 Reads and retrieves notes from the macOS Notes app
