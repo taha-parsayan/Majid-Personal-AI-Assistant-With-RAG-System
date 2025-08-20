@@ -45,3 +45,17 @@ https://github.com/taha-parsayan/Majid-Personal-AI-Assistant-With-RAG-System
 ```bash
 pip install -r requirements.txt
 ```
+
+3. Go to the [OpenAI](https://openai.com/) webpage and create an API key.
+
+4. Go to the [Tavily](https://www.tavily.com/) webpage and create an API key.
+
+5. In the software folder in your system, create a file called .env and fill it with your API keys:
+
+OPENAI_API_KEY = ?
+
+TAVILY_API_KEY = ?
+
+# How to use?
+
+Open a terminal, use ```bash cd ``` + the address of Majid's folder. Then run the software with ```bash python main.py ```.
