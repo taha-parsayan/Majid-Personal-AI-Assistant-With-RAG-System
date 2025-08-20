@@ -9,8 +9,13 @@ Majid is a cat! But not just any cat—he’s your AI-powered assistant built wi
 Majid combines productivity with personality:
 
 🐾 Reads and retrieves notes from the macOS Notes app
+
 📄 Opens and analyzes PDFs on demand
+
 🌐 Searches the web with Tavily
+
 🔎 Performs vector search with FAISS + OpenAI embeddings
+
 💾 Stores and recalls chat history using SQLite
+
 📅 Keeps track of events with Apple Calendar integration
