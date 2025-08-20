@@ -60,4 +60,4 @@ TAVILY_API_KEY = ?
 
 Open a terminal, use ```cd``` + the address of Majid's folder to go to that folder. Then run the software with ```python main.py```.
 
-In the top menue you can see Majid!
+You can see Majid in the top pannel of your macbook!
