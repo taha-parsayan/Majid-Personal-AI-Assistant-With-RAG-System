@@ -32,3 +32,10 @@ Majid combines productivity with personality:
 
 📅 Keeps track of events with Apple Calendar integration
 
+## How to install?
+
+1. Clone the repositiry into your system:
+
+```bash
+https://github.com/taha-parsayan/Majid-Personal-AI-Assistant-With-RAG-System
+
