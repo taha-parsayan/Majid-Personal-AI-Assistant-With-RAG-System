@@ -65,3 +65,10 @@ TAVILY_API_KEY = ?
 Open a terminal, use ```cd``` + the address of Majid's folder to go to that folder. Then run the software with ```python main.py```.
 
 You can see Majid in the top pannel of your macbook!
+
+### NOTE:
+Give the address of any PDF file in you system to majid and ask your questions unlimited and free. As an exmaple:
+
+```bash
+Hi Majid. This is my CV: /users/Taha/Documents/CV.pdf. Do you have any tips to improve it?
+```
