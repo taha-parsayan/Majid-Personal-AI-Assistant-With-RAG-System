@@ -58,4 +58,4 @@ TAVILY_API_KEY = ?
 
 # How to use?
 
-Open a terminal, use ```bash cd ``` + the address of Majid's folder. Then run the software with ```bash python main.py ```.
+Open a terminal, use ```cd``` + the address of Majid's folder. Then run the software with ```python main.py```.
