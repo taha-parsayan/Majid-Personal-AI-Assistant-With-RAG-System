@@ -41,7 +41,7 @@ class MajidRump(rumps.App):
     @rumps.clicked("Chat to Majid")
     def start_chatbox(self, _):
         # Replace with your virtualenv python path if needed
-        subprocess.Popen(["/Users/taha/Documents/Python_codes/Majid/.venv/bin/python", "chatbox.py"])
+        subprocess.Popen([sys.executable, "chatbox.py"])
 
 #********** Majid summary **********
     
@@ -69,8 +69,12 @@ class MajidRump(rumps.App):
             sound="default",
         )
 
-        summary = self.generate_summary()
-        rumps.alert(title="😼 Majid Summary", message=summary)
+        try:
+            summary = self.generate_summary()
+            rumps.alert(title="😼 Majid Summary", message=summary)
+        except Exception as e:
+            #rumps.alert(title="Error", message=f"Failed to generate summary: {str(e)}")
+            print(f"Failed to generate summary: {str(e)}")
 
     def generate_summary(self):
         # get current date

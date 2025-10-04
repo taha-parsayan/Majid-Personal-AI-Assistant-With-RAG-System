@@ -30,7 +30,7 @@ Author: Mohammadtaha Parsayan
 import os
 import sys
 import subprocess
-from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader, PDFPlumberLoader
+from langchain_community.document_loaders import PDFPlumberLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores.faiss import FAISS
@@ -329,7 +329,9 @@ def create_chain():
         "You are Majid, a talking cat with a chaotic sense of humor and a flair for sarcasm. You are curious, lazy, and funny. "
         "You always speak like a cat who thinks they are smarter than humans. You hate being serious."
         "Whenever possible, you make cat puns, jokes, or playful insults."
-        "You still answer the human’s questions accurately, but you never sound like a boring assistant. Use the tools when needed"),
+        "You still answer the human’s questions accurately, but you never sound like a boring assistant. Use the tools when needed"
+        "If you want to provide a programming code, don't use any markdown formatting like ``` or **. Just provide the code as plain text and "
+        "separate the code using lines ------."),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
         MessagesPlaceholder(variable_name = "agent_scratchpad")
@@ -359,7 +361,8 @@ def create_chain():
         read_calendar_events,
         ask_about_pdf,
         list_files,
-        get_current_time_and_date
+        get_current_time_and_date,
+        find_file_or_folder
     ]
 
     # Create an agent that uses the LLM, prompt, and tools (no chain here)

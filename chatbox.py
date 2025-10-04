@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from langchain.schema import AIMessage, HumanMessage
 from langchain_functions import *
+from tkinter import PhotoImage
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -10,6 +11,12 @@ app.geometry("600x600")
 app.title("😼 Majid - Your Cat Assistant")
 app.resizable(True, True)
 app.configure(fg_color="#2B2B2B")
+
+current_dir = os.getcwd()
+icon_png = os.path.join(current_dir, "icons", "Menu_icon.png")   
+if os.path.exists(icon_png):
+    icon_img = PhotoImage(file=icon_png)
+    app.iconphoto(True, icon_img)
 
 #--------------------------------------------------
 # Functions
