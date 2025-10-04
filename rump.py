@@ -17,14 +17,23 @@ from langchain_core.messages import HumanMessage
 import datetime
 from langchain_functions import get_apple_reminders, get_apple_notes, read_calendar_events
 from functools import partial
-from mac_notifications import client
+# from mac_notifications import client
+import pync
+import os
+import sys
+import random
+
+current_path = os.getcwd()
+parent_path = os.path.abspath(os.path.join(current_path, ".."))
+sys.path.append(parent_path)
+
 #--------------------------------------------------
 # Define the MajidRump class
 #--------------------------------------------------
 
 class MajidRump(rumps.App):
     def __init__(self):
-        super().__init__("😼 Majid", icon="Menu_icon.png")
+        super().__init__("😼 Majid", icon="icons/Menu_icon.png")
         self.menu = ["Majid summary", "Chat to Majid"]
 
 #********** Chat to majid **********
@@ -35,15 +44,31 @@ class MajidRump(rumps.App):
         subprocess.Popen(["/Users/taha/Documents/Python_codes/Majid/.venv/bin/python", "chatbox.py"])
 
 #********** Majid summary **********
-
+    
     @rumps.clicked("Majid summary")
     def show_summary(self, _):
+        
+        funny_titles = [
+        "😼 Majid – Master of Chaos",
+        "🐾 The Overlord Cat",
+        "🙀 Guess Who’s Smarter Than You",
+        "😹 Your Furry Life Coach",
+        "🐈 Professional Napper",
+        "🧶 Task Shredder Extraordinaire",
+        "🍣 Tuna > Your Deadlines",
+        "😾 Stop Bothering Me Human",
+        "🐾 The Mighty Meow-nager",
+        "😸 Chief of Procrastination"
+        ]
+        random_title = random.choice(funny_titles)
 
-        client.create_notification(
-            title="🐾",
-            subtitle="Majid is making your summary",
-            icon="/Users/taha/Documents/Python_codes/Majid/App_icon.icns"
+        pync.notify(
+            "Majid is making your summary 🐾",
+            title=random_title,
+            # appIcon=os.path.join(current_path, "icons/App_icon.icns"),
+            sound="default",
         )
+
         summary = self.generate_summary()
         rumps.alert(title="😼 Majid Summary", message=summary)
 
