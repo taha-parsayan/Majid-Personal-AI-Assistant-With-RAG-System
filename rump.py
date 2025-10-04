@@ -34,7 +34,7 @@ sys.path.append(parent_path)
 class MajidRump(rumps.App):
     def __init__(self):
         super().__init__("😼 Majid", icon="icons/Menu_icon.png")
-        self.menu = ["Majid summary", "Chat to Majid"]
+        self.menu = ["Majid summary", "Chat to Majid", "Set API keys"]
 
 #********** Chat to majid **********
 
@@ -101,12 +101,13 @@ class MajidRump(rumps.App):
             f"{notes_text}\n\n"
 
             "Instructions:\n"
-            "1. Start with a sarcastic and hilarious greeting as Majid.\n"
-            "2. Only use Calendar and list my events.\n"
+            "1. Start with a sarcastic and hilarious greeting as Majid (short).\n"
+            "2. Only use Calendar and list my events for today.\n"
             "3. Only use Reminders that are incomplete or still pending today.\n"
             "4. Only use Notes and use texts that clearly relate to a task that needs to be done. Ignore anything that sounds like a thought, idea, or journal entry.\n"
-            "5. Make a clear and organized daily plan, starting with a bullet list of Calendar events, then Reminders, then a short list of tasks based on my Notes (up to 10 max).\n"
-            "6. End with a very short and funny summary of what I need to do.\n\n"
+            "5. Make a clear and organized daily plan, starting with a bullet list of Calendar events, then Reminders, then a short list of tasks based on my Notes (up to 5 max).\n"
+            "6. End with a very short and funny summary of what I need to do.\n"
+            "7. Keep everything short so that the content fits inside the rump allert window\n\n"
 
             "Style Guide:\n"
             "- Avoid using ** or markdown formatting.\n"
@@ -126,3 +127,11 @@ class MajidRump(rumps.App):
 
         response = model.invoke([HumanMessage(content=prompt)])
         return response.content
+    
+
+#********** Set API keys **********
+
+    @rumps.clicked("Set API keys")
+    def set_api_keys(self, _):
+        # Replace with your virtualenv python path if needed
+        subprocess.Popen([sys.executable, "enter_api.py"])
