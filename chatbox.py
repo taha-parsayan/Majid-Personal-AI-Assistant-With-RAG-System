@@ -13,10 +13,17 @@ class ChatboxApp(ctk.CTk):
         #--------------------------------------------------
         # Load environment variables
         #--------------------------------------------------
-        self.current_path = os.getcwd()
-        os.environ.pop("OPENAI_API_KEY", None)
-        os.environ.pop("TAVILY_API_KEY", None)
-        load_dotenv(os.path.join(self.current_path, ".env"))
+
+        if getattr(sys, "_MEIPASS", False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.getcwd()
+
+        env_path = os.path.join(base_path, ".env")
+
+        os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
+        os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
+        load_dotenv(env_path) 
 
         #--------------------------------------------------
         # Configure window
@@ -29,7 +36,7 @@ class ChatboxApp(ctk.CTk):
         self.resizable(True, True)
         self.configure(fg_color="#2B2B2B")
 
-        icon_png = os.path.join(self.current_path, "icons", "Menu_icon.png")
+        icon_png = os.path.join(base_path, "icons", "Menu_icon.png")
         if os.path.exists(icon_png):
             icon_img = PhotoImage(file=icon_png)
             self.iconphoto(True, icon_img)
@@ -93,16 +100,17 @@ class ChatboxApp(ctk.CTk):
         bg_color = "#2B2B2B"
         fg_color = "white"
         if sender.lower() in ["you", "user"]:
-            bg_color = "#007BFF"
-            fg_color = "white"
+            # bg_color = "#007BFF"
+            fg_color = "yellow"
 
-        self.chat_box.insert("end", f"{sender}: {text}\n", tag_name)
+        # self.chat_box.insert("end", f"{sender}: {text}\n", tag_name)
+        self.chat_box.insert("end", f"{text}\n", tag_name)
         self.chat_box.tag_config(
             tag_name,
             justify="left" if align == "left" else "right",
-            lmargin1=10 if align == "left" else 50,
-            rmargin=10 if align == "right" else 50,
-            spacing3=5,
+            # lmargin1=10 if align == "left" else 50,
+            # rmargin=10 if align == "right" else 50,
+            # spacing3=5,
             background=bg_color,
             foreground=fg_color,
         )
