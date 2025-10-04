@@ -17,37 +17,54 @@ from langchain_core.messages import HumanMessage
 import datetime
 from langchain_functions import get_apple_reminders, get_apple_notes, read_calendar_events
 from functools import partial
-# from mac_notifications import client
 import pync
 import os
 import sys
 import random
-
-current_path = os.getcwd()
-parent_path = os.path.abspath(os.path.join(current_path, ".."))
-sys.path.append(parent_path)
-
-#--------------------------------------------------
-# Define the MajidRump class
-#--------------------------------------------------
+from dotenv import load_dotenv
+from chatbox import ChatboxApp
+import threading
+import subprocess
+import enter_api
 
 class MajidRump(rumps.App):
     def __init__(self):
         super().__init__("😼 Majid", icon="icons/Menu_icon.png")
         self.menu = ["Majid summary", "Chat to Majid", "Set API keys"]
 
-#********** Chat to majid **********
+        self.current_path = os.getcwd()
+        parent_path = os.path.abspath(os.path.join(self.current_path, ".."))
+        sys.path.append(parent_path)
+
+        #--------------------------------------------------
+        # Define the MajidRump class
+        #--------------------------------------------------
+
+    #********** Chat to majid **********
 
     @rumps.clicked("Chat to Majid")
     def start_chatbox(self, _):
-        # Replace with your virtualenv python path if needed
-        subprocess.Popen([sys.executable, "chatbox.py"])
+        python_path = sys.executable  # current Python interpreter
+        script_path = os.path.join(os.getcwd(), "chatbox.py")
+        subprocess.Popen([python_path, script_path])
 
-#********** Majid summary **********
+    #********** Majid summary **********
     
     @rumps.clicked("Majid summary")
     def show_summary(self, _):
+
+        #--------------------------------------------------
+        # Load environment variables
+        #--------------------------------------------------
+
+        os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
+        os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
+        load_dotenv(os.path.join(self.current_path, ".env")) 
         
+        #--------------------------------------------------
+        # Notify user that summary is being generated
+        #--------------------------------------------------
+
         funny_titles = [
         "😼 Majid – Master of Chaos",
         "🐾 The Overlord Cat",
@@ -75,6 +92,10 @@ class MajidRump(rumps.App):
         except Exception as e:
             #rumps.alert(title="Error", message=f"Failed to generate summary: {str(e)}")
             print(f"Failed to generate summary: {str(e)}")
+
+    #--------------------------------------------------
+    # Function to generate summary using LangChain and OpenAI
+    #--------------------------------------------------
 
     def generate_summary(self):
         # get current date
@@ -133,5 +154,6 @@ class MajidRump(rumps.App):
 
     @rumps.clicked("Set API keys")
     def set_api_keys(self, _):
-        # Replace with your virtualenv python path if needed
-        subprocess.Popen([sys.executable, "enter_api.py"])
+        python_path = sys.executable  # current Python interpreter
+        script_path = os.path.join(os.getcwd(), "enter_api.py")
+        subprocess.Popen([python_path, script_path])

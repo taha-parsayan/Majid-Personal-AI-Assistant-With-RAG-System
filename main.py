@@ -19,8 +19,6 @@ from rump import MajidRump
 
 # Add the parent directory to the system path
 current_path = os.getcwd()
-parent_path = os.path.abspath(os.path.join(current_path, ".."))
-sys.path.append(parent_path)
 
 #--------------------------------------------------
 # Load environment variables
