@@ -28,7 +28,10 @@ import subprocess
 class MajidRump(rumps.App):
     def __init__(self):
         super().__init__("😼 Majid", icon="icons/Menu_icon.png")
-        self.menu = ["Majid summary", "Chat to Majid", "Set API keys"]
+        self.menu = ["Majid summary", 
+                     "Chat to Majid", 
+                     "Set API keys",
+                    ]
 
         self.current_path = os.getcwd()
 
@@ -53,7 +56,6 @@ class MajidRump(rumps.App):
             subprocess.Popen([sys.executable, "enter_api_WEB.py"])
         except Exception as e:
             rumps.alert("Error", f"Failed to open API key entry: {str(e)}")
-
 
     #********** Majid summary **********
     

@@ -373,7 +373,7 @@ def create_chain():
     # llm model
     model = ChatOpenAI(
         model_name = "gpt-3.5-turbo",
-        temperature = 1,
+        temperature = 1
     )
 
     #prompt
