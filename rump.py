@@ -22,10 +22,8 @@ import os
 import sys
 import random
 from dotenv import load_dotenv
-from chatbox import ChatboxApp
-import threading
 import subprocess
-import enter_api
+
 
 class MajidRump(rumps.App):
     def __init__(self):
@@ -33,8 +31,6 @@ class MajidRump(rumps.App):
         self.menu = ["Majid summary", "Chat to Majid", "Set API keys"]
 
         self.current_path = os.getcwd()
-        parent_path = os.path.abspath(os.path.join(self.current_path, ".."))
-        sys.path.append(parent_path)
 
         #--------------------------------------------------
         # Define the MajidRump class
@@ -44,9 +40,20 @@ class MajidRump(rumps.App):
 
     @rumps.clicked("Chat to Majid")
     def start_chatbox(self, _):
-        python_path = sys.executable  # current Python interpreter
-        script_path = os.path.join(os.getcwd(), "chatbox.py")
-        subprocess.Popen([python_path, script_path])
+        try:
+            subprocess.Popen([sys.executable, "chatbox_WEB.py"])
+        except Exception as e:
+            rumps.alert("Error", f"Failed to open API key entry: {str(e)}")
+
+    #********** Set API keys **********
+
+    @rumps.clicked("Set API keys")
+    def set_api_keys(self, _):
+        try:
+            subprocess.Popen([sys.executable, "enter_api_WEB.py"])
+        except Exception as e:
+            rumps.alert("Error", f"Failed to open API key entry: {str(e)}")
+
 
     #********** Majid summary **********
     
@@ -158,10 +165,3 @@ class MajidRump(rumps.App):
         return response.content
     
 
-#********** Set API keys **********
-
-    @rumps.clicked("Set API keys")
-    def set_api_keys(self, _):
-        python_path = sys.executable  # current Python interpreter
-        script_path = os.path.join(os.getcwd(), "enter_api.py")
-        subprocess.Popen([python_path, script_path])

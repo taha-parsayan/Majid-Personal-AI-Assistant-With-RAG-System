@@ -53,6 +53,18 @@ import sqlite3
 
 
 #----------------------------------------------------------------------------
+# Define resource paths
+#----------------------------------------------------------------------------
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, relative_path)
+
+#----------------------------------------------------------------------------
 # SQLite database setup
 #----------------------------------------------------------------------------
 
@@ -228,33 +240,14 @@ def get_current_time_and_date() -> str:
 # ***** File Management Tools *******
 
 @tool
-def find_file_or_folder(name: str, search_root: str = "/Users/taha/") -> str:
-    """
-    Searches for a file or folder by exact name starting from a given directory.
-    Returns full path(s) of all matches.
-    Note: This can be slow if search_root is large.
-    """
-    matches = []
-    for root, dirs, files in os.walk(search_root):
-        # Check for matching files
-        if name in files:
-            matches.append(os.path.join(root, name))
-        # Check for matching directories
-        if name in dirs:
-            matches.append(os.path.join(root, name))
-
-    if not matches:
-        return f"No file or folder named '{name}' found under {search_root}."
-    
-    return f"Found {len(matches)} match(es):\n" + "\n".join(matches)
-
-
-@tool
-def list_files(path:str) -> str:
+def list_files(path: Optional[str] = None) -> str:
     """
     List all files and folders in the specified directory path.
-    Returns an error if the path does not exist or is not a directory.
+    If path is None, use the base folder as /Users.
     """
+    if not path:
+        path = resource_path("")  # fallback to base folder
+
     if not os.path.exists(path):
         return f"Path does not exist: {path}"
     if not os.path.isdir(path):
@@ -265,6 +258,66 @@ def list_files(path:str) -> str:
         return f"No files found in directory: {path}"
     
     return f"Files in {path}:\n" + "\n".join(files)
+
+
+@tool
+def find_file_or_folder(name: str, search_root: Optional[str] = None) -> str:
+    """
+    Searches for a file or folder by exact name starting from a given directory.
+    If search_root is None, use the base folder.
+    """
+    if not search_root:
+        search_root = resource_path("")
+
+    matches = []
+    for root, dirs, files in os.walk(search_root):
+        if name in files:
+            matches.append(os.path.join(root, name))
+        if name in dirs:
+            matches.append(os.path.join(root, name))
+
+    if not matches:
+        return f"No file or folder named '{name}' found under {search_root}."
+    
+    return f"Found {len(matches)} match(es):\n" + "\n".join(matches)
+
+
+@tool
+def browse_folder(path: str = "/Users/taha/Documents") -> str:
+    """
+    Browse a folder interactively.
+    - Lists files and subfolders.
+    - Returns an easy-to-read list with type indicators.
+    """
+    if not os.path.exists(path):
+        return f"Path does not exist: {path}"
+    if not os.path.isdir(path):
+        return f"Path is not a directory: {path}"
+
+    items = os.listdir(path)
+    if not items:
+        return f"No files or folders in {path}"
+
+    output = [f"Contents of {path}:"]
+    for item in items:
+        full_path = os.path.join(path, item)
+        if os.path.isdir(full_path):
+            output.append(f"[Folder] {item}")
+        else:
+            output.append(f"[File]   {item}")
+    return "\n".join(output)
+
+
+@tool
+def select_item(folder_path: str, item_name: str) -> str:
+    """
+    Choose an item from a folder by name.
+    Returns full path if it exists.
+    """
+    full_path = os.path.join(folder_path, item_name)
+    if not os.path.exists(full_path):
+        return f"Item '{item_name}' not found in {folder_path}"
+    return full_path
     
 
 # ***** PDF Tools *******
@@ -362,7 +415,9 @@ def create_chain():
         ask_about_pdf,
         list_files,
         get_current_time_and_date,
-        find_file_or_folder
+        find_file_or_folder,
+        browse_folder,
+        select_item
     ]
 
     # Create an agent that uses the LLM, prompt, and tools (no chain here)

@@ -24,6 +24,12 @@ current_path = os.getcwd()
 # Load environment variables
 #--------------------------------------------------
 
+'''
+The goal is to make this project a .exe app.
+Every time a separate file is used, we have to use the 
+following code to set the current folder as base_path.
+EVERY TIME!
+'''
 if getattr(sys, "_MEIPASS", False):
     base_path = sys._MEIPASS
 else:
