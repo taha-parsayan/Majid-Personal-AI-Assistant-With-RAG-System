@@ -1,14 +1,37 @@
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template_string, request
 from dotenv import load_dotenv, set_key
-import os
+import os, subprocess
 import webbrowser
 import threading
+import sys
 
 app = Flask(__name__)
 
+#--------------------------------------------------
+# Set environment variables path
+#--------------------------------------------------
+
 # Path to .env file
-env_path = os.path.join(os.getcwd(), ".env")
+'''
+# For app deployment:
+
+if getattr(sys, "_MEIPASS", False):
+    base_path = sys._MEIPASS
+else:
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+env_path = os.path.join(base_path, ".env")
 load_dotenv(dotenv_path=env_path)
+'''
+
+# For .exe:
+# .env file path
+user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+env_path = os.path.join(user_dir, ".env")
+
+#--------------------------------------------------
+# HTML template
+#--------------------------------------------------
 
 HTML = """
 <!DOCTYPE html>
@@ -47,6 +70,7 @@ HTML = """
 </html>
 """
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     message, color = "", "white"
@@ -73,10 +97,35 @@ def index():
     return render_template_string(HTML, message=message, color=color)
 
 
+#--------------------------------------------------
+# Free the ports
+#--------------------------------------------------
+
+def free_port(port):
+    try:
+        result = subprocess.run(
+            ["lsof", "-ti", f"tcp:{port}"],
+            capture_output=True,
+            text=True
+        )
+        pid = result.stdout.strip()
+        if pid:
+            subprocess.run(["kill", "-9", pid])
+            print(f"Killed process {pid} using port {port}")
+        else:
+            print(f"No process found on port {port}")
+    except Exception as e:
+        print("Error freeing port:", e)
+
+
+#--------------------------------------------------
+# Run the app
+#--------------------------------------------------
+
 def run_app():
     app.run(port=5005, debug=False)
 
-
 if __name__ == "__main__":
+    free_port(5005)
     threading.Thread(target=run_app).start()
     webbrowser.open("http://127.0.0.1:5005")

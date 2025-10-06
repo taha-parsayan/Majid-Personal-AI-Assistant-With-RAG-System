@@ -1,6 +1,6 @@
 from flask import Flask, render_template_string, request, jsonify
 from dotenv import load_dotenv
-import os, sys, webbrowser
+import os, sys, webbrowser, subprocess
 from langchain.schema import AIMessage, HumanMessage
 from langchain_functions import (
     create_chain,
@@ -8,22 +8,22 @@ from langchain_functions import (
     load_chat_history_from_database,
     save_message_in_database,
 )
+import rumps
 
 app = Flask(__name__)
 
 #--------------------------------------------------
 # Load environment
 #--------------------------------------------------
-if getattr(sys, "_MEIPASS", False):
-    base_path = sys._MEIPASS
-else:
-    base_path = os.getcwd()
-
-env_path = os.path.join(base_path, ".env")
-os.environ.pop("OPENAI_API_KEY", None)
-os.environ.pop("TAVILY_API_KEY", None)
-load_dotenv(env_path)
-
+try:
+    user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+    env_path = os.path.join(user_dir, ".env")
+    os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
+    os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
+    load_dotenv(env_path)
+except Exception as e:
+    rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
+    
 #--------------------------------------------------
 # Chain & chat history
 #--------------------------------------------------
@@ -201,9 +201,32 @@ def chat():
 
     return jsonify({"response": response})
 
+
+#--------------------------------------------------
+# Free the ports
+#--------------------------------------------------
+
+
+def free_port(port):
+    try:
+        result = subprocess.run(
+            ["lsof", "-ti", f"tcp:{port}"],
+            capture_output=True,
+            text=True
+        )
+        pid = result.stdout.strip()
+        if pid:
+            subprocess.run(["kill", "-9", pid])
+            print(f"Killed process {pid} using port {port}")
+        else:
+            print(f"No process found on port {port}")
+    except Exception as e:
+        print("Error freeing port:", e)
+
 #--------------------------------------------------
 # Run server
 #--------------------------------------------------
 if __name__ == "__main__":
+    free_port(5006)
     webbrowser.open("http://127.0.0.1:5006")
-    app.run(port=5006, debug=False)
+    app.run(port=5006, debug=True)

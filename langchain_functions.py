@@ -362,6 +362,7 @@ def ask_about_pdf(pdf_path: str, question: str) -> str:
 
     except Exception as e:
         return f"Error processing PDF file: {e}"
+        print(f"Error processing PDF file: {e}")
 
 
 #----------------------------------------------------------------------------

@@ -46,7 +46,7 @@ class MajidRump(rumps.App):
         try:
             subprocess.Popen([sys.executable, "chatbox_WEB.py"])
         except Exception as e:
-            rumps.alert("Error", f"Failed to open API key entry: {str(e)}")
+            rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
 
     #********** Set API keys **********
 
@@ -66,16 +66,14 @@ class MajidRump(rumps.App):
         # Load environment variables
         #--------------------------------------------------
 
-        if getattr(sys, "_MEIPASS", False):
-            base_path = sys._MEIPASS
-        else:
-            base_path = os.getcwd()
-
-        env_path = os.path.join(base_path, ".env")
-
-        os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
-        os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
-        load_dotenv(env_path) 
+        try:
+            user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+            env_path = os.path.join(user_dir, ".env")
+            os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
+            os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
+            load_dotenv(env_path)
+        except Exception as e:
+            rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
         
         #--------------------------------------------------
         # Notify user that summary is being generated
@@ -95,6 +93,11 @@ class MajidRump(rumps.App):
         ]
         random_title = random.choice(funny_titles)
 
+        if getattr(sys, "_MEIPASS", False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+
         pync.notify(
             "Majid is making your summary 🐾",
             title=random_title,
@@ -107,8 +110,7 @@ class MajidRump(rumps.App):
             icon_path = os.path.join(base_path, "icons", "App_icon.icns")
             rumps.alert(title="😼 Majid Summary", message=summary, icon_path=icon_path)
         except Exception as e:
-            rumps.alert(title="Error", message=f"Failed to generate summary: {str(e)}")
-            print(f"Failed to generate summary: {str(e)}")
+            rumps.alert("Error", f"You need to set the API keys first: \n {str(e)}")
 
     #--------------------------------------------------
     # Function to generate summary using LangChain and OpenAI
@@ -165,5 +167,3 @@ class MajidRump(rumps.App):
 
         response = model.invoke([HumanMessage(content=prompt)])
         return response.content
-    
-
