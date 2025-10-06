@@ -229,4 +229,4 @@ def free_port(port):
 if __name__ == "__main__":
     free_port(5006)
     webbrowser.open("http://127.0.0.1:5006")
-    app.run(port=5006, debug=True)
+    app.run(port=5006, debug=False)
