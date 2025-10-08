@@ -6,17 +6,59 @@ Usage:
 """
 
 from setuptools import setup
+import glob, os, shutil
+import subprocess
+
 
 APP = ['main.py']
-DATA_FILES = ['icons/Menu_icon.png', 'icons/App_icon.icns', 'rump.py', '.env', 'chatbox_WEB.py', 'enter_api_WEB.py', 'langchain_functions.py']
+
+lib_path = '/opt/miniconda3/envs/majid/lib/'
+dest_path = 'dist/Majid.app/Contents/Frameworks/'
+
+os.makedirs(dest_path, exist_ok=True)
+
+for lib in ['libssl.3.dylib', 'libcrypto.3.dylib']:
+    src = os.path.join(lib_path, lib)
+    dst = os.path.join(dest_path, lib)
+    if os.path.exists(src) and not os.path.exists(dst):
+        shutil.copy(src, dst)
+
+src = '/opt/miniconda3/envs/majid/lib/libsqlite3.dylib'
+dst = '/opt/miniconda3/envs/majid/lib/libsqlite3.0.dylib'
+if os.path.exists(src) and not os.path.exists(dst):
+    shutil.copy(src, dst)
+
+
+DATA_FILES = [
+    'rump.py',
+    'chatbox_WEB.py',
+    'enter_api_WEB.py',
+    'langchain_functions.py',
+    ('icons', glob.glob('icons/*')),
+    '/opt/miniconda3/envs/majid/lib/libsqlite3.dylib',
+    ('parsedatetime/pdt_locales', glob.glob('/opt/miniconda3/envs/majid/lib/python3.12/site-packages/parsedatetime/pdt_locales/*'))
+]
 OPTIONS = {
+    "excludes": [
+        "setuptools",
+        "zmq",
+        "jupyter",
+        "pypdfium2",
+        "pypdfium2_raw"
+    ],
     'argv_emulation': True,
     'plist': {
         'CFBundleName': 'Majid',
         'CFBundleDisplayName': 'Majid',
-        'CFBundleIconFile': 'App_icon.icns'  # <- this tells macOS which icon to use
+        'CFBundleIconFile': 'icons/App_icon.icns'
     },
-    'packages': [],
+    'packages': ['parsedatetime', 'parsedatetime.pdt_locales', 'flask', 'pdfplumber'],
+    'frameworks': [
+        '/opt/miniconda3/envs/majid/lib/libffi.8.dylib',
+        '/opt/miniconda3/envs/majid/lib/libssl.3.dylib',
+        '/opt/miniconda3/envs/majid/lib/libcrypto.3.dylib',
+        '/opt/miniconda3/envs/majid/lib/libsqlite3.0.dylib'
+    ],
 }
 setup(
     app=APP,

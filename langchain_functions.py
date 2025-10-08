@@ -36,18 +36,12 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.output_parsers import StrOutputParser
-from langchain.chains import create_retrieval_chain
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain.tools.retriever import create_retriever_tool
 from langchain_tavily import TavilySearch
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain.tools import tool
 from macnotesapp import NotesApp
-import applescript
 from typing import Optional
-import parsedatetime
 import datetime
 import sqlite3
 
@@ -70,7 +64,12 @@ def resource_path(relative_path):
 
 # SQLite load chat history from database
 def load_chat_history_from_database():
-    conn = sqlite3.connect('chat_history.db') # Connect to the SQLite database
+
+    # define the path to the database
+    user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+    db_path = os.path.join(user_dir, "chat_history.db")
+
+    conn = sqlite3.connect(db_path) # Connect to the SQLite database
     cursor = conn.cursor() # Create a cursor object to execute SQL commands
 
     # Always try to create the table (harmless if it already exists)
@@ -100,7 +99,12 @@ def load_chat_history_from_database():
 
 # Save chat history in the database
 def save_message_in_database(role, message):
-    conn = sqlite3.connect('chat_history.db')
+
+    # define the path to the database
+    user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+    db_path = os.path.join(user_dir, "chat_history.db")
+
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute("INSERT INTO history (role, message, timestamp) VALUES (?, ?, ?)",

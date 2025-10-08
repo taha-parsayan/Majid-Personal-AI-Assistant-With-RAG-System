@@ -15,15 +15,16 @@ from langchain_functions import *
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 import datetime
-from langchain_functions import get_apple_reminders, get_apple_notes, read_calendar_events
-from functools import partial
 import pync
 import os
 import sys
 import random
 from dotenv import load_dotenv
-import subprocess
+import threading
 
+print("\nRunning rump with:", sys.executable)
+print("Frozen:", getattr(sys, "frozen", False))
+print('\n')
 
 class MajidRump(rumps.App):
     def __init__(self):
@@ -35,18 +36,48 @@ class MajidRump(rumps.App):
 
         self.current_path = os.getcwd()
 
-        #--------------------------------------------------
-        # Define the MajidRump class
-        #--------------------------------------------------
-
     #********** Chat to majid **********
 
     @rumps.clicked("Chat to Majid")
     def start_chatbox(self, _):
+        #--------------------------------------------------
+        # Load environment variables
+        #--------------------------------------------------
+
+        print("\nSetting the API keys...\n")
         try:
-            subprocess.Popen([sys.executable, "chatbox_WEB.py"])
+            user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+            env_path = os.path.join(user_dir, ".env")
+            os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
+            os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
+            load_dotenv(env_path)
         except Exception as e:
             rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
+        print("\nDone\n")
+
+        #--------------------------------------------------
+        # Open chatbox_WEB.py
+        #--------------------------------------------------
+        '''
+        rump.py uses the dist/Majid.app/Contents/MacOS/python
+        So we need to use the same python executable to run chatbox_WEB.py
+        BUT! we cannot use subprocess.Popen with sys.executable
+        because the python cannot run 2 processes at the same time!
+        Therefore! we need to use threading to run chatbox_WEB.py
+        otherwise the python packages won't be included.
+        '''
+        # Start chatbox within the same process
+        try:
+            print("\nStarting Flask thread...\n")
+
+            def run_chatbox():
+                import chatbox_WEB
+                chatbox_WEB.run_flask()
+
+            threading.Thread(target=run_chatbox, daemon=True).start()
+
+        except Exception as e:
+            print(f"\nError starting chatbox:\n{str(e)}\n")
 
     #********** Set API keys **********
 
@@ -108,9 +139,9 @@ class MajidRump(rumps.App):
         try:
             summary = self.generate_summary()
             icon_path = os.path.join(base_path, "icons", "App_icon.icns")
-            rumps.alert(title="😼 Majid Summary", message=summary, icon_path=icon_path)
+            rumps.alert(title="😼 Majid Summary", message=summary)
         except Exception as e:
-            rumps.alert("Error", f"You need to set the API keys first: \n {str(e)}")
+            rumps.alert("Error", f"Error making the summary: \n {str(e)}")
 
     #--------------------------------------------------
     # Function to generate summary using LangChain and OpenAI

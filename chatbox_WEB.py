@@ -1,34 +1,41 @@
-from flask import Flask, render_template_string, request, jsonify
-from dotenv import load_dotenv
-import os, sys, webbrowser, subprocess
+import os, sys
+
+print("\nRunning chatbox_WEB with:", sys.executable)
+print("Frozen:", getattr(sys, "frozen", False))
+print('\n')
+
+print("\nImport 1\n")
+try:
+    from langchain_functions import *
+except Exception as e:
+    print(f"\nError importing langchain_functions: {str(e)}\n")
+print("\nImport 2\n")
+from flask import Flask, request, jsonify
+print("\nImport 3\n")
+import webbrowser, subprocess
+print("\nImport 4\n")
 from langchain.schema import AIMessage, HumanMessage
-from langchain_functions import (
-    create_chain,
-    process_chat,
-    load_chat_history_from_database,
-    save_message_in_database,
-)
+print("\nImport 5\n")
 import rumps
 
-app = Flask(__name__)
+print("\nDone\n")
 
-#--------------------------------------------------
-# Load environment
-#--------------------------------------------------
-try:
-    user_dir = os.path.expanduser("~/Library/Application Support/Majid")
-    env_path = os.path.join(user_dir, ".env")
-    os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
-    os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
-    load_dotenv(env_path)
-except Exception as e:
-    rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
-    
+print("\nMaking Flask app...\n")
+app = Flask(__name__)
+print("\nDone\n")
+
 #--------------------------------------------------
 # Chain & chat history
 #--------------------------------------------------
-chain = create_chain()
-chat_history = load_chat_history_from_database()
+print("\nSetting up the APIs...\n")
+
+try:
+    chain = create_chain()
+    chat_history = load_chat_history_from_database()
+except Exception as e:
+    rumps.alert("Error", f"Could not create the AI agent:\n {str(e)}")
+
+print("\nDone\n")
 
 #--------------------------------------------------
 # HTML template
@@ -183,10 +190,13 @@ HTML = """
 #--------------------------------------------------
 @app.route("/")
 def index():
+    print("\nDef Index\n")
     return HTML
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
+    print("\ndef chat\n")
     data = request.get_json()
     user_input = data.get("message", "").strip()
     if not user_input:
@@ -199,13 +209,13 @@ def chat():
     chat_history.append(AIMessage(content=response))
     save_message_in_database("ai", response)
 
+    print("\nDone\n")
     return jsonify({"response": response})
 
 
 #--------------------------------------------------
 # Free the ports
 #--------------------------------------------------
-
 
 def free_port(port):
     try:
@@ -226,7 +236,15 @@ def free_port(port):
 #--------------------------------------------------
 # Run server
 #--------------------------------------------------
-if __name__ == "__main__":
+def run_flask():
     free_port(5006)
     webbrowser.open("http://127.0.0.1:5006")
     app.run(port=5006, debug=False)
+
+# if __name__ == "__main__":
+#     try:
+#         run_flask()
+#     except Exception as e:
+#         print(f"Error starting the server:\n{str(e)}")
+
+

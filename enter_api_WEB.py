@@ -3,7 +3,11 @@ from dotenv import load_dotenv, set_key
 import os, subprocess
 import webbrowser
 import threading
-import sys
+import sys, os
+
+print("\nRunning enter_api with:", sys.executable)
+print("Frozen:", getattr(sys, "frozen", False))
+print('\n')
 
 app = Flask(__name__)
 
