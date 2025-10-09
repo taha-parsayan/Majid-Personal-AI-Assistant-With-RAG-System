@@ -16,7 +16,26 @@ import os
 import sys
 import subprocess
 from dotenv import load_dotenv
-from rump import MajidRump
+
+
+from langchain_community.document_loaders import PDFPlumberLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_tavily import TavilySearch
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain.tools import tool
+from macnotesapp import NotesApp
+from typing import Optional
+import datetime
+import sqlite3
+
+print("\nRunning main with:", sys.executable)
+print("Frozen:", getattr(sys, "frozen", False))
+print('\n')
 
 #--------------------------------------------------
 # Load environment variables
@@ -62,4 +81,5 @@ load_dotenv(env_path)
 # Main
 #--------------------------------------------------
 if __name__ == "__main__":
+    from rump import MajidRump
     MajidRump().run()

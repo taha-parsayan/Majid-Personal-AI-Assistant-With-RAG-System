@@ -22,6 +22,8 @@ import random
 from dotenv import load_dotenv
 import threading
 
+import pdfplumber
+
 print("\nRunning rump with:", sys.executable)
 print("Frozen:", getattr(sys, "frozen", False))
 print('\n')
@@ -72,6 +74,7 @@ class MajidRump(rumps.App):
 
             def run_chatbox():
                 import chatbox_WEB
+
                 chatbox_WEB.run_flask()
 
             threading.Thread(target=run_chatbox, daemon=True).start()

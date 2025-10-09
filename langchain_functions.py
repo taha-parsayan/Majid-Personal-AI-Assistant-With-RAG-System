@@ -45,7 +45,6 @@ from typing import Optional
 import datetime
 import sqlite3
 
-
 #----------------------------------------------------------------------------
 # Define resource paths
 #----------------------------------------------------------------------------
@@ -364,9 +363,9 @@ def ask_about_pdf(pdf_path: str, question: str) -> str:
 
         return response.content
 
-    except Exception as e:
-        return f"Error processing PDF file: {e}"
+    except Exception as e:        
         print(f"Error processing PDF file: {e}")
+        return f"Error processing PDF file: {e}"
 
 
 #----------------------------------------------------------------------------

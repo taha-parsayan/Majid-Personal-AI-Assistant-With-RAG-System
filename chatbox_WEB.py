@@ -1,22 +1,19 @@
+#--------------------------------------------------
+# Include packages
+#--------------------------------------------------
 import os, sys
 
 print("\nRunning chatbox_WEB with:", sys.executable)
 print("Frozen:", getattr(sys, "frozen", False))
 print('\n')
 
-print("\nImport 1\n")
-try:
-    from langchain_functions import *
-except Exception as e:
-    print(f"\nError importing langchain_functions: {str(e)}\n")
-print("\nImport 2\n")
+from langchain_functions import *
 from flask import Flask, request, jsonify
-print("\nImport 3\n")
 import webbrowser, subprocess
-print("\nImport 4\n")
 from langchain.schema import AIMessage, HumanMessage
-print("\nImport 5\n")
 import rumps
+import sys
+import importlib
 
 print("\nDone\n")
 
