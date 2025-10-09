@@ -130,6 +130,6 @@ def run_app():
     app.run(port=5005, debug=False)
 
 if __name__ == "__main__":
-    free_port(5005)
+    # free_port(5005)
     threading.Thread(target=run_app).start()
     webbrowser.open("http://127.0.0.1:5005")
