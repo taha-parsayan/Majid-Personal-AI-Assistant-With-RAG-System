@@ -1,0 +1,35 @@
+End User License Agreement (EULA)
+Majid AI Assistant Cat Software
+© 2025 Mohammadtaha Parsayan. All rights reserved.
+
+1. License Grant
+By purchasing or downloading Majid AI Assistant Cat (“Software”), you are granted a non-exclusive, non-transferable, revocable license to install and use the Software on your personal computer for your own use. This license does not transfer ownership of the Software or any related intellectual property rights.
+
+2. Restrictions
+You may not:
+
+Sell, resell, rent, lease, or sublicense the Software.
+
+Copy, modify, decompile, reverse-engineer, or distribute the Software or its components.
+
+Use the Software for any unlawful, harmful, or commercial hosting purpose.
+
+Remove or alter any proprietary notices or trademarks from the Software.
+
+3. Ownership
+The Software and all associated materials remain the exclusive property of Mohammadtaha Parsayan. The Software is licensed, not sold. All rights not expressly granted to you are reserved by the author.
+
+4. Updates and Support
+Updates may be provided at the author’s discretion. Continued access to updates may require an active purchase, subscription, or renewal. Support is not guaranteed unless explicitly stated at the time of purchase.
+
+5. Termination
+This license is effective until terminated. It will automatically terminate if you fail to comply with any term of this EULA. Upon termination, you must uninstall and cease all use of the Software.
+
+6. Disclaimer of Warranties
+The Software is provided “as is,” without warranties of any kind, express or implied. You assume all responsibility and risk for the use of the Software.
+
+7. Limitation of Liability
+In no event shall Mohammadtaha Parsayan be liable for any damages arising from the use or inability to use the Software, including loss of data, profits, or business interruption.
+
+8. Governing Law
+This agreement shall be governed by and construed in accordance with the laws of Denmark, without regard to its conflict of law provisions.
