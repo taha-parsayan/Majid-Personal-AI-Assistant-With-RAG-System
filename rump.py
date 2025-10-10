@@ -32,7 +32,6 @@ class MajidRump(rumps.App):
     def __init__(self):
         super().__init__("😼 Majid", icon="icons/Menu_icon.png")
         self.menu = ["Majid summary", 
-                     "Chat to Majid", 
                      "Set API keys",
                     ]
 
@@ -40,47 +39,47 @@ class MajidRump(rumps.App):
 
     #********** Chat to majid **********
 
-    @rumps.clicked("Chat to Majid")
-    def start_chatbox(self, _):
-        #--------------------------------------------------
-        # Load environment variables
-        #--------------------------------------------------
+    # @rumps.clicked("Chat to Majid")
+    # def start_chatbox(self, _):
+    #     #--------------------------------------------------
+    #     # Load environment variables
+    #     #--------------------------------------------------
 
-        print("\nSetting the API keys...\n")
-        try:
-            user_dir = os.path.expanduser("~/Library/Application Support/Majid")
-            env_path = os.path.join(user_dir, ".env")
-            os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
-            os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
-            load_dotenv(env_path)
-        except Exception as e:
-            rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
-        print("\nDone\n")
+    #     print("\nSetting the API keys...\n")
+    #     try:
+    #         user_dir = os.path.expanduser("~/Library/Application Support/Majid")
+    #         env_path = os.path.join(user_dir, ".env")
+    #         os.environ.pop("OPENAI_API_KEY", None) # Because it loads a key from some place I dont know!
+    #         os.environ.pop("TAVILY_API_KEY", None) # Because it loads a key from some place I dont know!
+    #         load_dotenv(env_path)
+    #     except Exception as e:
+    #         rumps.alert("Error", f"You need to set the API keys first:\n {str(e)}")
+    #     print("\nDone\n")
 
-        #--------------------------------------------------
-        # Open chatbox_WEB.py
-        #--------------------------------------------------
-        '''
-        rump.py uses the dist/Majid.app/Contents/MacOS/python
-        So we need to use the same python executable to run chatbox_WEB.py
-        BUT! we cannot use subprocess.Popen with sys.executable
-        because the python cannot run 2 processes at the same time!
-        Therefore! we need to use threading to run chatbox_WEB.py
-        otherwise the python packages won't be included.
-        '''
-        # Start chatbox within the same process
-        try:
-            print("\nStarting Flask thread...\n")
+    #     #--------------------------------------------------
+    #     # Open chatbox_WEB.py
+    #     #--------------------------------------------------
+    #     '''
+    #     rump.py uses the dist/Majid.app/Contents/MacOS/python
+    #     So we need to use the same python executable to run chatbox_WEB.py
+    #     BUT! we cannot use subprocess.Popen with sys.executable
+    #     because the python cannot run 2 processes at the same time!
+    #     Therefore! we need to use threading to run chatbox_WEB.py
+    #     otherwise the python packages won't be included.
+    #     '''
+    #     # Start chatbox within the same process
+    #     try:
+    #         print("\nStarting Flask thread...\n")
 
-            def run_chatbox():
-                import chatbox_WEB
+    #         def run_chatbox():
+    #             import chatbox_WEB
 
-                chatbox_WEB.run_flask()
+    #             chatbox_WEB.run_flask()
 
-            threading.Thread(target=run_chatbox, daemon=True).start()
+    #         threading.Thread(target=run_chatbox, daemon=True).start()
 
-        except Exception as e:
-            print(f"\nError starting chatbox:\n{str(e)}\n")
+    #     except Exception as e:
+    #         print(f"\nError starting chatbox:\n{str(e)}\n")
 
     #********** Set API keys **********
 
